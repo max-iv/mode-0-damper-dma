@@ -96,21 +96,6 @@
         }
     },
     {
-        "id": "21ff842d.62f36c",
-        "type": "serial-port",
-        "z": "",
-        "serialport": "/dev/ttyS0",
-        "serialbaud": "115200",
-        "databits": "8",
-        "parity": "none",
-        "stopbits": "1",
-        "newline": "28",
-        "bin": "bin",
-        "out": "count",
-        "addchar": true,
-        "responsetimeout": "10000"
-    },
-    {
         "id": "79250bf3.365cc4",
         "type": "mqtt-broker",
         "z": "",
@@ -133,20 +118,6 @@
         "willPayload": ""
     },
     {
-        "id": "ea743ee6.d8b55",
-        "type": "serial in",
-        "z": "5f562f66.a301e",
-        "name": "Teensy",
-        "serial": "21ff842d.62f36c",
-        "x": 70,
-        "y": 280,
-        "wires": [
-            [
-                "d5761f6c.c46e6"
-            ]
-        ]
-    },
-    {
         "id": "93049b70.2dc5c8",
         "type": "mqtt out",
         "z": "5f562f66.a301e",
@@ -155,18 +126,8 @@
         "qos": "0",
         "retain": "false",
         "broker": "79250bf3.365cc4",
-        "x": 890,
-        "y": 280,
-        "wires": []
-    },
-    {
-        "id": "3f988ea4.7ee392",
-        "type": "serial out",
-        "z": "5f562f66.a301e",
-        "name": "Teensy",
-        "serial": "21ff842d.62f36c",
-        "x": 1120,
-        "y": 120,
+        "x": 1050,
+        "y": 40,
         "wires": []
     },
     {
@@ -178,8 +139,8 @@
         "qos": "0",
         "datatype": "auto",
         "broker": "79250bf3.365cc4",
-        "x": 110,
-        "y": 40,
+        "x": 130,
+        "y": 880,
         "wires": [
             [
                 "dc36009e.fdeeb"
@@ -194,12 +155,12 @@
         "property": "payload",
         "action": "",
         "pretty": false,
-        "x": 270,
-        "y": 40,
+        "x": 290,
+        "y": 880,
         "wires": [
             [
-                "f3f3f15.081c31",
-                "5902d0c0.241a6"
+                "5902d0c0.241a6",
+                "aad8ecf5.c0443"
             ]
         ]
     },
@@ -213,45 +174,98 @@
         "createDir": false,
         "overwriteFile": "true",
         "encoding": "none",
-        "x": 980,
-        "y": 40,
+        "x": 480,
+        "y": 780,
         "wires": [
             []
         ]
     },
     {
-        "id": "f3f3f15.081c31",
+        "id": "cd04ce51.35497",
         "type": "function",
         "z": "5f562f66.a301e",
-        "name": "createSettings",
-        "func": "function getAttrObject(device, propName, attrName)\n{\n    var props = device[propName];\n    var attr = props.find(attr => attr.attr === attrName);\n    return attr;\n}\nvar echoSettings = 0;\nvar ledState = 0;\nvar ledValue = 0;\nvar ledPeriod = 0;\nvar ultraAlarmDistance = 0;\n\nvar echoSettingsMask = 0;\nvar ledStateMask = 0;\nvar ledValueMask = 0;\nvar ledPeriodMask = 0;\nvar ultraAlarmDistanceMask = 0;\nif (msg.topic == 'echoSettings')\n{\n    echoSettings = msg.payload;\n    echoSettingsMask = 1;\n}\nelse\n{\n    var device = msg.payload;\n    ledState = getAttrObject(device, 'settings', 'ledState').value;\n    ledValue = getAttrObject(device, 'settings', 'ledValue').value;\n    ledPeriod = getAttrObject(device, 'settings', 'ledPeriod').value;\n    ultraAlarmDistance = getAttrObject(device, 'settings', 'ultraAlarm').value;\n    var ultraDist = getAttrObject(device, 'readings', 'ultraDist');\n    ultraDist.alarm.limits.low = ultraAlarmDistance;\n    ledStateMask = 1;\n    ledValueMask = 1;\n    ledPeriodMask = 1;\n    ultraAlarmDistanceMask = 1;\n    for (var ii = 0; ii < msg.payload.settings.length; ++ii)\n    {\n        if (msg.payload.settings[ii].type == 'scalar')\n        {\n            msg.payload.settings[ii].alarm.value = 0;\n            if (!isNaN(msg.payload.settings[ii].value))\n            {\n                if (msg.payload.settings[ii].value < msg.payload.settings[ii].alarm.limits.low)  msg.payload.settings[ii].alarm.value = 1;\n                if (msg.payload.settings[ii].value < msg.payload.settings[ii].alarm.limits.lolo) msg.payload.settings[ii].alarm.value = 3;\n                if (msg.payload.settings[ii].value > msg.payload.settings[ii].alarm.limits.high) msg.payload.settings[ii].alarm.value = 2;\n                if (msg.payload.settings[ii].value > msg.payload.settings[ii].alarm.limits.hihi) msg.payload.settings[ii].alarm.value = 4;\n            }\n        }\n    }\n\n    flow.set('device', msg.payload);    \n}\n\n\nvar buffer = new ArrayBuffer(40);\nvar settingsView = new DataView(buffer);\nsettingsView.setInt32(0,echoSettingsMask, true);\nsettingsView.setInt32(4,ledStateMask, true);\nsettingsView.setInt32(8,ledValueMask, true);\nsettingsView.setInt32(12,ledPeriodMask, true);\nsettingsView.setInt32(16,ultraAlarmDistanceMask, true);\n\nsettingsView.setInt32(20,echoSettings, true);\nsettingsView.setInt32(24,ledState, true);\nsettingsView.setInt32(28,ledValue, true);\nsettingsView.setInt32(32,ledPeriod, true);\nsettingsView.setInt32(36,ultraAlarmDistance, true);\n\nreturn {topic:'settings',payload:Buffer.from(buffer)};",
+        "name": "Check Reading Alarms",
+        "func": "for (var ii = 0; ii < msg.payload.readings.length; ++ii)\n{\n    if (msg.payload.readings[ii].type == 'scalar')\n    {\n        msg.payload.readings[ii].alarm.value = 0;\n        if (!isNaN(msg.payload.readings[ii].value))\n        {\n            if (msg.payload.readings[ii].value < msg.payload.readings[ii].alarm.limits.low)  msg.payload.readings[ii].alarm.value = 1;\n            if (msg.payload.readings[ii].value < msg.payload.readings[ii].alarm.limits.lolo) msg.payload.readings[ii].alarm.value = 3;\n            if (msg.payload.readings[ii].value > msg.payload.readings[ii].alarm.limits.high) msg.payload.readings[ii].alarm.value = 2;\n            if (msg.payload.readings[ii].value > msg.payload.readings[ii].alarm.limits.hihi) msg.payload.readings[ii].alarm.value = 4;\n        }\n    }\n}\nflow.set('device', msg.payload);\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 960,
-        "y": 120,
+        "x": 840,
+        "y": 40,
         "wires": [
             [
-                "3f988ea4.7ee392"
+                "93049b70.2dc5c8"
             ]
         ]
     },
     {
-        "id": "302aa037.053d1",
+        "id": "f69c600b.9542",
+        "type": "exec",
+        "z": "5f562f66.a301e",
+        "command": "iwconfig",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "oldrc": false,
+        "name": "",
+        "x": 280,
+        "y": 40,
+        "wires": [
+            [
+                "afd71a05.ebd4e8"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "5b86fa96.034764",
         "type": "inject",
         "z": "5f562f66.a301e",
         "name": "",
-        "topic": "echoSettings",
-        "payload": "1",
-        "payloadType": "num",
-        "repeat": "1",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "2",
         "crontab": "",
         "once": true,
-        "onceDelay": "5",
+        "onceDelay": 0.1,
         "x": 120,
-        "y": 120,
+        "y": 40,
         "wires": [
             [
-                "f3f3f15.081c31"
+                "f69c600b.9542"
+            ]
+        ]
+    },
+    {
+        "id": "afd71a05.ebd4e8",
+        "type": "function",
+        "z": "5f562f66.a301e",
+        "name": "Get Signal Quality",
+        "func": "var info = msg.payload;\nvar linkStartIndex  = info.indexOf('Link Quality=');\nvar levelStartIndex = info.indexOf('Signal level=');\nvar linkStopIndex   = info.indexOf('/70');\nvar levelStopIndex   = info.lastIndexOf('dBm');\nvar linkQuality = Number(info.substring(linkStartIndex + 13, linkStopIndex));\nvar signalLevel =  Number(info.substring(levelStartIndex + 13, levelStopIndex - 1));\nvar ssid = info.substring(info.indexOf('ESSID') + 7);\nssid = ssid.substring(0,ssid.indexOf('\"'));\nvar val = {linkQuality : linkQuality, signalLevel: signalLevel, ssid:ssid};\nflow.set('linkQuality',linkQuality);\nflow.set('signalLevel', signalLevel);\nflow.set('ssid', ssid);\nreturn {topic :'test',payload : val};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 460,
+        "y": 40,
+        "wires": [
+            [
+                "89bfcb7d.570178"
+            ]
+        ]
+    },
+    {
+        "id": "89bfcb7d.570178",
+        "type": "function",
+        "z": "5f562f66.a301e",
+        "name": "get readings",
+        "func": "function getAttrObject(device, propName, attrName)\n{\n    var props = device[propName];\n    var attr = props.find(attr => attr.attr === attrName);\n    return attr;\n}\n\nvar device = flow.get('device');\nvar attrLink = getAttrObject(device, 'readings', 'linkQuality');\nvar attrSignal = getAttrObject(device, 'readings', 'signalLevel');\nattrLink.value = flow.get('linkQuality');\nattrSignal.value = flow.get('signalLevel');\n\nreturn {topic:'device',payload:device};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 650,
+        "y": 40,
+        "wires": [
+            [
+                "cd04ce51.35497"
             ]
         ]
     },
@@ -268,7 +282,7 @@
         "once": true,
         "onceDelay": 0.1,
         "x": 140,
-        "y": 200,
+        "y": 300,
         "wires": [
             [
                 "163af492.5e952b"
@@ -286,7 +300,7 @@
         "sendError": false,
         "encoding": "none",
         "x": 360,
-        "y": 200,
+        "y": 300,
         "wires": [
             [
                 "53c95857.5f3d68"
@@ -302,130 +316,738 @@
         "action": "",
         "pretty": false,
         "x": 530,
-        "y": 200,
+        "y": 300,
         "wires": [
             [
-                "30f384ea.cf21fc"
+                "38503a7f.593d06"
             ]
         ]
     },
     {
-        "id": "30f384ea.cf21fc",
+        "id": "38503a7f.593d06",
         "type": "function",
         "z": "5f562f66.a301e",
-        "name": "Save initSettings in Memory",
-        "func": "flow.set('device', msg.payload);\nreturn msg;",
-        "outputs": 1,
+        "name": "parse initSettings",
+        "func": "function getAttrObject(device, propName, attrName)\n{\n    var props = device[propName];\n    var attr = props.find(attr => attr.attr === attrName);\n    return attr;\n}\n\nvar device = msg.payload;\nfor (var ii = 0; ii < msg.payload.settings.length; ++ii)\n{\n    if (msg.payload.settings[ii].type == 'scalar')\n    {\n        msg.payload.settings[ii].alarm.value = 0;\n        if (!isNaN(msg.payload.settings[ii].value))\n        {\n            if (msg.payload.settings[ii].value < msg.payload.settings[ii].alarm.limits.low)  msg.payload.settings[ii].alarm.value = 1;\n            if (msg.payload.settings[ii].value < msg.payload.settings[ii].alarm.limits.lolo) msg.payload.settings[ii].alarm.value = 3;\n            if (msg.payload.settings[ii].value > msg.payload.settings[ii].alarm.limits.high) msg.payload.settings[ii].alarm.value = 2;\n            if (msg.payload.settings[ii].value > msg.payload.settings[ii].alarm.limits.hihi) msg.payload.settings[ii].alarm.value = 4;\n        }\n    }\n}\n\nflow.set('device', msg.payload);    \n\nreturn [\n    {topic:'chanOn0',       payload:getAttrObject(device, 'settings', 'on-dipole').value},\n    {topic:'timeOffset0',   payload:getAttrObject(device, 'settings', 'filter-dipole').value},\n    {topic:'sign0',         payload:getAttrObject(device, 'settings', 'sign-dipole').value},\n    {topic:'maxAcValue0',   payload:getAttrObject(device, 'settings', 'max-ac-dipole').value},\n    {topic:'gain0',         payload:getAttrObject(device, 'settings', 'gain-dipole').value},\n    {topic:'dacOffset0',    payload:getAttrObject(device, 'settings', 'offset-dipole').value},\n    {topic:'chanOn1',       payload:getAttrObject(device, 'settings', 'on-quad').value},\n    {topic:'timeOffset1',   payload:getAttrObject(device, 'settings', 'filter-quad').value},\n    {topic:'sign1',         payload:getAttrObject(device, 'settings', 'sign-quad').value},\n    {topic:'maxAcValue1',   payload:getAttrObject(device, 'settings', 'max-ac-quad').value},\n    {topic:'gain1',         payload:getAttrObject(device, 'settings', 'gain-quad').value},\n    {topic:'dacOffset1',    payload:getAttrObject(device, 'settings', 'offset-quad').value},\n    ];\n",
+        "outputs": 12,
         "noerr": 0,
-        "x": 720,
-        "y": 200,
+        "x": 690,
+        "y": 300,
         "wires": [
             [
-                "f3f3f15.081c31"
+                "f59aa147.f05a3"
+            ],
+            [
+                "793beae4.568504"
+            ],
+            [
+                "86c022ca.0bc48"
+            ],
+            [
+                "5ba98a4.e097874"
+            ],
+            [
+                "c5e84a98.3ed998"
+            ],
+            [
+                "249626db.38e73a"
+            ],
+            [
+                "59ed3b71.cc61c4"
+            ],
+            [
+                "c229dd7e.e3d31"
+            ],
+            [
+                "f4b5bede.ed744"
+            ],
+            [
+                "4dc6cfc0.1c8af"
+            ],
+            [
+                "4693b0db.e060f"
+            ],
+            [
+                "df8f2683.99d278"
             ]
         ]
     },
     {
-        "id": "d5761f6c.c46e6",
+        "id": "a5c8af.09b1a75",
         "type": "function",
         "z": "5f562f66.a301e",
-        "name": "Parse Reading Byte Array",
-        "func": "var ib;\n\nvar photoDetValueView       = new DataView(new ArrayBuffer(4));\nvar ultraDistanceView       = new DataView(new ArrayBuffer(4));\nvar ultraAlarmDistanceView  = new DataView(new ArrayBuffer(4));\nvar tempAvgView             = new DataView(new ArrayBuffer(4));\nvar ledStateView            = new DataView(new ArrayBuffer(4));\nvar ledValueView            = new DataView(new ArrayBuffer(4));\nvar ledPeriodView           = new DataView(new ArrayBuffer(4));\n\nfor (ib = 0; ib < 4; ++ib)      photoDetValueView.setUint8(ib, msg.payload[0 * 4 + 3 - ib]);\nfor (ib = 0; ib < 4; ++ib)      ultraDistanceView.setUint8(ib, msg.payload[1 * 4 + 3 - ib]);\nfor (ib = 0; ib < 4; ++ib) ultraAlarmDistanceView.setUint8(ib, msg.payload[2 * 4 + 3 - ib]);\nfor (ib = 0; ib < 4; ++ib)            tempAvgView.setUint8(ib, msg.payload[3 * 4 + 3 - ib]);\nfor (ib = 0; ib < 4; ++ib)           ledStateView.setUint8(ib, msg.payload[4 * 4 + 3 - ib]);\nfor (ib = 0; ib < 4; ++ib)           ledValueView.setUint8(ib, msg.payload[5 * 4 + 3 - ib]);\nfor (ib = 0; ib < 4; ++ib)          ledPeriodView.setUint8(ib, msg.payload[6 * 4 + 3 - ib]);\n\nvar device = flow.get('device');\ndevice.readings[0].value = ledStateView.getInt32(0);\ndevice.readings[1].value = photoDetValueView.getInt32(0);\ndevice.readings[2].value = Math.round(100.0 * tempAvgView.getFloat32(0)) / 100.0;\ndevice.readings[3].value = ultraDistanceView.getInt32(0);\ndevice.readings[4].value = flow.get('linkQuality');\ndevice.readings[5].value = flow.get('signalLevel');\n\nreturn {topic : 'reading', payload : device};\n",
+        "name": "Prep Teensy message",
+        "func": "return {topic:msg.topic, payload: (msg.topic + ' ' + msg.payload.toString())};",
         "outputs": 1,
         "noerr": 0,
-        "x": 250,
-        "y": 280,
+        "x": 1140,
+        "y": 220,
         "wires": [
             [
-                "fafe8611.1f12e8"
+                "9a9e83e1.275c5"
             ]
         ]
     },
     {
-        "id": "cd04ce51.35497",
+        "id": "793beae4.568504",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 930,
+        "y": 260,
+        "wires": [
+            [
+                "f59aa147.f05a3"
+            ]
+        ]
+    },
+    {
+        "id": "86c022ca.0bc48",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 930,
+        "y": 300,
+        "wires": [
+            [
+                "793beae4.568504"
+            ]
+        ]
+    },
+    {
+        "id": "5ba98a4.e097874",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 930,
+        "y": 340,
+        "wires": [
+            [
+                "86c022ca.0bc48"
+            ]
+        ]
+    },
+    {
+        "id": "c5e84a98.3ed998",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 930,
+        "y": 380,
+        "wires": [
+            [
+                "5ba98a4.e097874"
+            ]
+        ]
+    },
+    {
+        "id": "249626db.38e73a",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 930,
+        "y": 420,
+        "wires": [
+            [
+                "c5e84a98.3ed998"
+            ]
+        ]
+    },
+    {
+        "id": "59ed3b71.cc61c4",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 930,
+        "y": 460,
+        "wires": [
+            [
+                "249626db.38e73a"
+            ]
+        ]
+    },
+    {
+        "id": "c229dd7e.e3d31",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 930,
+        "y": 500,
+        "wires": [
+            [
+                "59ed3b71.cc61c4"
+            ]
+        ]
+    },
+    {
+        "id": "f4b5bede.ed744",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 930,
+        "y": 540,
+        "wires": [
+            [
+                "c229dd7e.e3d31"
+            ]
+        ]
+    },
+    {
+        "id": "4dc6cfc0.1c8af",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 930,
+        "y": 580,
+        "wires": [
+            [
+                "f4b5bede.ed744"
+            ]
+        ]
+    },
+    {
+        "id": "4693b0db.e060f",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 930,
+        "y": 620,
+        "wires": [
+            [
+                "4dc6cfc0.1c8af"
+            ]
+        ]
+    },
+    {
+        "id": "df8f2683.99d278",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 930,
+        "y": 660,
+        "wires": [
+            [
+                "4693b0db.e060f"
+            ]
+        ]
+    },
+    {
+        "id": "f59aa147.f05a3",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 930,
+        "y": 220,
+        "wires": [
+            [
+                "a5c8af.09b1a75"
+            ]
+        ]
+    },
+    {
+        "id": "aad8ecf5.c0443",
         "type": "function",
+        "z": "5f562f66.a301e",
+        "name": "parse initSettings",
+        "func": "function getAttrObject(device, propName, attrName)\n{\n    var props = device[propName];\n    var attr = props.find(attr => attr.attr === attrName);\n    return attr;\n}\n\nvar device = msg.payload;\nfor (var ii = 0; ii < msg.payload.settings.length; ++ii)\n{\n    if (msg.payload.settings[ii].type == 'scalar')\n    {\n        msg.payload.settings[ii].alarm.value = 0;\n        if (!isNaN(msg.payload.settings[ii].value))\n        {\n            if (msg.payload.settings[ii].value < msg.payload.settings[ii].alarm.limits.low)  msg.payload.settings[ii].alarm.value = 1;\n            if (msg.payload.settings[ii].value < msg.payload.settings[ii].alarm.limits.lolo) msg.payload.settings[ii].alarm.value = 3;\n            if (msg.payload.settings[ii].value > msg.payload.settings[ii].alarm.limits.high) msg.payload.settings[ii].alarm.value = 2;\n            if (msg.payload.settings[ii].value > msg.payload.settings[ii].alarm.limits.hihi) msg.payload.settings[ii].alarm.value = 4;\n        }\n    }\n}\nvar teensyName = [\n    'chanOn0',\n    'timeOffset0',\n    'sign0',\n    'maxAcValue0',\n    'gain0',\n    'dacOffset0',\n    'chanOn1',\n    'timeOffset1',\n    'sign1',\n    'maxAcValue1',\n    'gain1',\n    'dacOffset1',\n    ];\nvar attrName = [\n    'on-dipole',\n    'filter-dipole',\n    'sign-dipole',\n    'max-ac-dipole',\n    'gain-dipole',\n    'offset-dipole',\n    'on-quad',\n    'filter-quad',\n    'sign-quad',\n    'max-ac-quad',\n    'gain-quad',\n    'offset-quad',\n    ]\nvar oldDevice = flow.get('device');\nvar payload = [];\nfor (var ii = 0; ii < 13; ++ii) payload[ii] = null;\nvar icount = 1;\nfor (var ii = 0; ii < 12; ++ii)\n{\n    if (getAttrObject(device, 'settings', attrName[ii]).value != getAttrObject(oldDevice, 'settings', attrName[ii]).value)\n    {\n        payload[icount] = {topic:teensyName[ii], payload:getAttrObject(device, 'settings', attrName[ii]).value};\n        ++icount;\n    }\n}\nvar attrLink = getAttrObject(device, 'readings', 'linkQuality');\nvar attrSignal = getAttrObject(device, 'readings', 'signalLevel');\nattrLink.value = flow.get('linkQuality');\nattrSignal.value = flow.get('signalLevel');\npayload[0] = {topic:'device',payload:device};\nflow.set('device', device);    \n\nreturn payload;\n",
+        "outputs": 13,
+        "noerr": 0,
+        "x": 650,
+        "y": 920,
+        "wires": [
+            [
+                "f1dfc009.94cda"
+            ],
+            [
+                "67e5950f.722f3c"
+            ],
+            [
+                "93be835b.869d1"
+            ],
+            [
+                "8892880.2c7c678"
+            ],
+            [
+                "7cebc3d0.3b5f1c"
+            ],
+            [
+                "80a769ea.0ac978"
+            ],
+            [
+                "fe7b2c04.71751"
+            ],
+            [
+                "41fe307f.02975"
+            ],
+            [
+                "1b25d7d.6c8b428"
+            ],
+            [
+                "82e31b85.dbca28"
+            ],
+            [
+                "982e7037.66c01"
+            ],
+            [
+                "f05fb5d5.354688"
+            ],
+            [
+                "10d75af2.3c7ec5"
+            ]
+        ]
+    },
+    {
+        "id": "9a9e83e1.275c5",
+        "type": "debug",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 1290,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "a4ad3242.87f7a",
+        "type": "function",
+        "z": "5f562f66.a301e",
+        "name": "Prep Teensy message",
+        "func": "return {topic:msg.topic, payload: (msg.topic + ' ' + msg.payload.toString())};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1080,
+        "y": 840,
+        "wires": [
+            [
+                "9a9e83e1.275c5"
+            ]
+        ]
+    },
+    {
+        "id": "93be835b.869d1",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 870,
+        "y": 880,
+        "wires": [
+            [
+                "67e5950f.722f3c"
+            ]
+        ]
+    },
+    {
+        "id": "8892880.2c7c678",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 870,
+        "y": 920,
+        "wires": [
+            [
+                "93be835b.869d1"
+            ]
+        ]
+    },
+    {
+        "id": "7cebc3d0.3b5f1c",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 870,
+        "y": 960,
+        "wires": [
+            [
+                "8892880.2c7c678"
+            ]
+        ]
+    },
+    {
+        "id": "80a769ea.0ac978",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 870,
+        "y": 1000,
+        "wires": [
+            [
+                "7cebc3d0.3b5f1c"
+            ]
+        ]
+    },
+    {
+        "id": "fe7b2c04.71751",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 870,
+        "y": 1040,
+        "wires": [
+            [
+                "80a769ea.0ac978"
+            ]
+        ]
+    },
+    {
+        "id": "41fe307f.02975",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 870,
+        "y": 1080,
+        "wires": [
+            [
+                "fe7b2c04.71751"
+            ]
+        ]
+    },
+    {
+        "id": "1b25d7d.6c8b428",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 870,
+        "y": 1120,
+        "wires": [
+            [
+                "41fe307f.02975"
+            ]
+        ]
+    },
+    {
+        "id": "82e31b85.dbca28",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 870,
+        "y": 1160,
+        "wires": [
+            [
+                "1b25d7d.6c8b428"
+            ]
+        ]
+    },
+    {
+        "id": "982e7037.66c01",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 870,
+        "y": 1200,
+        "wires": [
+            [
+                "82e31b85.dbca28"
+            ]
+        ]
+    },
+    {
+        "id": "f05fb5d5.354688",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 870,
+        "y": 1240,
+        "wires": [
+            [
+                "982e7037.66c01"
+            ]
+        ]
+    },
+    {
+        "id": "10d75af2.3c7ec5",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 870,
+        "y": 1280,
+        "wires": [
+            [
+                "f05fb5d5.354688"
+            ]
+        ]
+    },
+    {
+        "id": "67e5950f.722f3c",
+        "type": "delay",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 870,
+        "y": 840,
+        "wires": [
+            [
+                "a4ad3242.87f7a"
+            ]
+        ]
+    },
+    {
+        "id": "f1dfc009.94cda",
+        "type": "link out",
+        "z": "5f562f66.a301e",
+        "name": "",
+        "links": [
+            "f6714104.d9fbc"
+        ],
+        "x": 840,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "f6714104.d9fbc",
+        "type": "link in",
         "z": "5f562f66.a301e",
         "name": "Check Reading Alarms",
-        "func": "for (var ii = 0; ii < msg.payload.readings.length; ++ii)\n{\n    if (msg.payload.readings[ii].type == 'scalar')\n    {\n        msg.payload.readings[ii].alarm.value = 0;\n        if (!isNaN(msg.payload.readings[ii].value))\n        {\n            if (msg.payload.readings[ii].value < msg.payload.readings[ii].alarm.limits.low)  msg.payload.readings[ii].alarm.value = 1;\n            if (msg.payload.readings[ii].value < msg.payload.readings[ii].alarm.limits.lolo) msg.payload.readings[ii].alarm.value = 3;\n            if (msg.payload.readings[ii].value > msg.payload.readings[ii].alarm.limits.high) msg.payload.readings[ii].alarm.value = 2;\n            if (msg.payload.readings[ii].value > msg.payload.readings[ii].alarm.limits.hihi) msg.payload.readings[ii].alarm.value = 4;\n        }\n    }\n}\nflow.set('device', msg.payload);\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 680,
-        "y": 280,
-        "wires": [
-            [
-                "93049b70.2dc5c8"
-            ]
-        ]
-    },
-    {
-        "id": "fafe8611.1f12e8",
-        "type": "function",
-        "z": "5f562f66.a301e",
-        "name": "Fake Vector Data",
-        "func": "var x = [];\nvar y = [];\nvar npts = 51;\nvar harm = msg.payload.settings[4].value;\nvar deltaPhi = msg.payload.settings[5].value;\nvar phi = context.get('phi');\nif (phi == undefined) phi = -deltaPhi;\nphi = phi + deltaPhi;\ncontext.set('phi', phi);\nfor (var ii = 0; ii < npts; ++ii)\n{\n   x[ii] = ii * 360.0 / (npts - 1);\n   y[ii] = Math.round( 1000 * Math.cos((x[ii] * harm + phi)  * Math.PI / 180.0)) / 1000;\n}\nmsg.payload.readings[6].value[0] = x;\nmsg.payload.readings[6].value[1] = y;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 470,
-        "y": 280,
+        "links": [
+            "f1dfc009.94cda"
+        ],
+        "x": 695,
+        "y": 100,
         "wires": [
             [
                 "cd04ce51.35497"
             ]
-        ]
-    },
-    {
-        "id": "f69c600b.9542",
-        "type": "exec",
-        "z": "5f562f66.a301e",
-        "command": "iwconfig",
-        "addpay": false,
-        "append": "",
-        "useSpawn": "false",
-        "timer": "",
-        "oldrc": false,
-        "name": "",
-        "x": 280,
-        "y": 360,
-        "wires": [
-            [
-                "afd71a05.ebd4e8"
-            ],
-            [],
-            []
-        ]
-    },
-    {
-        "id": "5b86fa96.034764",
-        "type": "inject",
-        "z": "5f562f66.a301e",
-        "name": "",
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "repeat": "5",
-        "crontab": "",
-        "once": true,
-        "onceDelay": 0.1,
-        "x": 120,
-        "y": 360,
-        "wires": [
-            [
-                "f69c600b.9542"
-            ]
-        ]
-    },
-    {
-        "id": "afd71a05.ebd4e8",
-        "type": "function",
-        "z": "5f562f66.a301e",
-        "name": "Get Signal Quality",
-        "func": "var info = msg.payload.split('\\n')[6];\nvar linkStartIndex = info.indexOf('Link Quality=');\nvar linkStopIndex = info.indexOf('/70');\nvar linkQuality = Number(info.substring(linkStartIndex + 13, linkStopIndex));\nvar levelStartIndex = info.indexOf('level=') + 6;\nvar levelStopIndex = info.indexOf('dBm') - 1;\nvar signalLevel = Number(info.substring(levelStartIndex, levelStopIndex));\nvar val = {linkQuality : linkQuality, signalLevel: signalLevel};\nflow.set('linkQuality',linkQuality);\nflow.set('signalLevel', signalLevel);\nreturn {topic :'test',payload : val};",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 460,
-        "y": 360,
-        "wires": [
-            []
         ]
     }
 ]
