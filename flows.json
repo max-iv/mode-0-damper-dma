@@ -118,6 +118,20 @@
         "willPayload": ""
     },
     {
+        "id": "3015577f.f8ec58",
+        "type": "serial-port",
+        "z": "",
+        "serialport": "/dev/ttyACM0",
+        "serialbaud": "9600",
+        "databits": "8",
+        "parity": "none",
+        "stopbits": "1",
+        "newline": "\\n",
+        "bin": "false",
+        "out": "char",
+        "addchar": true
+    },
+    {
         "id": "93049b70.2dc5c8",
         "type": "mqtt out",
         "z": "5f562f66.a301e",
@@ -384,6 +398,7 @@
         "y": 220,
         "wires": [
             [
+                "e04a3c2f.e165",
                 "9a9e83e1.275c5"
             ]
         ]
@@ -742,6 +757,7 @@
         "y": 840,
         "wires": [
             [
+                "e04a3c2f.e165",
                 "9a9e83e1.275c5"
             ]
         ]
@@ -1049,5 +1065,15 @@
                 "cd04ce51.35497"
             ]
         ]
+    },
+    {
+        "id": "e04a3c2f.e165",
+        "type": "serial out",
+        "z": "5f562f66.a301e",
+        "name": "Teensy3.5",
+        "serial": "3015577f.f8ec58",
+        "x": 1310,
+        "y": 520,
+        "wires": []
     }
 ]
