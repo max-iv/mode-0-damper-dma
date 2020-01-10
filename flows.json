@@ -99,8 +99,8 @@
         "id": "79250bf3.365cc4",
         "type": "mqtt-broker",
         "z": "",
-        "name": "MQTT Broker",
-        "broker": "$(MQTTSERVERIP)",
+        "name": "MQTT Broker 2",
+        "broker": "$(MQTTSERVERIP2)",
         "port": "1883",
         "clientid": "$(MQTTCLIENTID)",
         "usetls": false,
@@ -126,21 +126,23 @@
         "databits": "8",
         "parity": "none",
         "stopbits": "1",
+        "waitfor": "",
         "newline": "\\n",
         "bin": "false",
         "out": "char",
-        "addchar": true
+        "addchar": "true",
+        "responsetimeout": ""
     },
     {
         "id": "93049b70.2dc5c8",
         "type": "mqtt out",
         "z": "5f562f66.a301e",
-        "name": "Publish Readings",
+        "name": "Publish Readings 2",
         "topic": "$(MQTTPUBLISHTOPIC)",
         "qos": "0",
         "retain": "false",
         "broker": "79250bf3.365cc4",
-        "x": 1050,
+        "x": 1070,
         "y": 40,
         "wires": []
     },
@@ -148,7 +150,7 @@
         "id": "8cda9011.eab33",
         "type": "mqtt in",
         "z": "5f562f66.a301e",
-        "name": "Subscribe Settings",
+        "name": "Subscribe Settings 2",
         "topic": "$(MQTTSUBSCRIBETOPIC)",
         "qos": "0",
         "datatype": "auto",
@@ -173,7 +175,7 @@
         "y": 880,
         "wires": [
             [
-                "5902d0c0.241a6",
+                "de05ba8f.6881d8",
                 "aad8ecf5.c0443"
             ]
         ]
@@ -188,8 +190,8 @@
         "createDir": false,
         "overwriteFile": "true",
         "encoding": "none",
-        "x": 480,
-        "y": 780,
+        "x": 660,
+        "y": 720,
         "wires": [
             []
         ]
@@ -398,8 +400,8 @@
         "y": 220,
         "wires": [
             [
-                "e04a3c2f.e165",
-                "9a9e83e1.275c5"
+                "9a9e83e1.275c5",
+                "e04a3c2f.e165"
             ]
         ]
     },
@@ -741,8 +743,8 @@
         "console": false,
         "tostatus": false,
         "complete": "false",
-        "x": 1290,
-        "y": 840,
+        "x": 1350,
+        "y": 400,
         "wires": []
     },
     {
@@ -757,8 +759,8 @@
         "y": 840,
         "wires": [
             [
-                "e04a3c2f.e165",
-                "9a9e83e1.275c5"
+                "9a9e83e1.275c5",
+                "e04a3c2f.e165"
             ]
         ]
     },
@@ -1075,5 +1077,21 @@
         "x": 1310,
         "y": 520,
         "wires": []
+    },
+    {
+        "id": "de05ba8f.6881d8",
+        "type": "function",
+        "z": "5f562f66.a301e",
+        "name": "Make Pretty",
+        "func": "var jsonPretty = JSON.stringify(msg.payload,null,2);\nreturn {topic: msg.payload, payload:jsonPretty};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 450,
+        "y": 720,
+        "wires": [
+            [
+                "5902d0c0.241a6"
+            ]
+        ]
     }
 ]

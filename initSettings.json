@@ -1,1 +1,291 @@
-{"name":"mode-0-damper","arcPeriod":60000,"timeStamp":1568634372335,"lastArchive":1568634332512,"readings":[{"attr":"linkQuality","type":"scalar","value":50,"unit":"/70","alarm":{"value":0,"limits":{"lolo":30,"low":40,"high":71,"hihi":80},"notify":{"name":"","number":"","time":0}}},{"attr":"signalLevel","type":"scalar","value":-60,"unit":"dBm","alarm":{"value":0,"limits":{"lolo":-70,"low":-60,"high":0,"hihi":30},"notify":{"name":"","number":"","time":0}}}],"settings":[{"attr":"max-ac-dipole","type":"scalar","value":20,"unit":"unit","alarm":{"value":0,"limits":{"lolo":0,"low":0,"high":1024,"hihi":1024},"notify":{"name":"","number":"","time":0}}},{"attr":"max-ac-quad","type":"scalar","value":20,"unit":"unit","alarm":{"value":0,"limits":{"lolo":0,"low":0,"high":1024,"hihi":1024},"notify":{"name":"","number":"","time":0}}},{"attr":"offset-dipole","type":"scalar","value":555,"unit":"unit","alarm":{"value":0,"limits":{"lolo":0,"low":0,"high":1024,"hihi":1024},"notify":{"name":"","number":"","time":0}}},{"attr":"offset-quad","type":"scalar","value":455,"unit":"unit","alarm":{"value":0,"limits":{"lolo":0,"low":0,"high":1024,"hihi":1024},"notify":{"name":"","number":"","time":0}}},{"attr":"on-dipole","type":"scalar","value":1,"unit":"unit","alarm":{"value":0,"limits":{"lolo":-1,"low":-1,"high":2,"hihi":2},"notify":{"name":"","number":"","time":0}}},{"attr":"on-quad","type":"scalar","value":0,"unit":"unit","alarm":{"value":0,"limits":{"lolo":-1,"low":-1,"high":2,"hihi":2},"notify":{"name":"","number":"","time":0}}},{"attr":"sign-dipole","type":"scalar","value":1,"unit":"unit","alarm":{"value":0,"limits":{"lolo":-2,"low":-2,"high":2,"hihi":2},"notify":{"name":"","number":"","time":0}}},{"attr":"sign-quad","type":"scalar","value":-1,"unit":"unit","alarm":{"value":0,"limits":{"lolo":-2,"low":-2,"high":2,"hihi":2},"notify":{"name":"","number":"","time":0}}},{"attr":"gain-dipole","type":"scalar","value":2,"unit":"unit","alarm":{"value":0,"limits":{"lolo":-8,"low":-8,"high":8,"hihi":8},"notify":{"name":"","number":"","time":0}}},{"attr":"gain-quad","type":"scalar","value":1,"unit":"unit","alarm":{"value":0,"limits":{"lolo":-8,"low":-8,"high":8,"hihi":8},"notify":{"name":"","number":"","time":0}}},{"attr":"filter-dipole","type":"scalar","value":19,"unit":"unit","alarm":{"value":0,"limits":{"lolo":1,"low":1,"high":20,"hihi":20},"notify":{"name":"","number":"","time":0}}},{"attr":"filter-quad","type":"scalar","value":9,"unit":"unit","alarm":{"value":0,"limits":{"lolo":1,"low":1,"high":20,"hihi":20},"notify":{"name":"","number":"","time":0}}}]}
+{
+  "name": "r3",
+  "deviceType": "mode-0-damper",
+  "arcPeriod": 60000,
+  "timeStamp": 0,
+  "lastArchive": 0,
+  "readings": [
+    {
+      "attr": "linkQuality",
+      "type": "scalar",
+      "value": 0,
+      "unit": "/70",
+      "alarm": {
+        "value": 0,
+        "limits": {
+          "lolo": 30,
+          "low": 40,
+          "high": 71,
+          "hihi": 80
+        },
+        "notify": {
+          "name": "",
+          "number": "",
+          "time": 0
+        }
+      }
+    },
+    {
+      "attr": "signalLevel",
+      "type": "scalar",
+      "value": 0,
+      "unit": "dBm",
+      "alarm": {
+        "value": 0,
+        "limits": {
+          "lolo": -70,
+          "low": -60,
+          "high": 0,
+          "hihi": 30
+        },
+        "notify": {
+          "name": "",
+          "number": "",
+          "time": 0
+        }
+      }
+    }
+  ],
+  "settings": [
+    {
+      "attr": "max-ac-dipole",
+      "type": "scalar",
+      "value": 20,
+      "unit": "unit",
+      "alarm": {
+        "value": 0,
+        "limits": {
+          "lolo": 0,
+          "low": 0,
+          "high": 1024,
+          "hihi": 1024
+        },
+        "notify": {
+          "name": "",
+          "number": "",
+          "time": 0
+        }
+      }
+    },
+    {
+      "attr": "max-ac-quad",
+      "type": "scalar",
+      "value": 20,
+      "unit": "unit",
+      "alarm": {
+        "value": 0,
+        "limits": {
+          "lolo": 0,
+          "low": 0,
+          "high": 1024,
+          "hihi": 1024
+        },
+        "notify": {
+          "name": "",
+          "number": "",
+          "time": 0
+        }
+      }
+    },
+    {
+      "attr": "offset-dipole",
+      "type": "scalar",
+      "value": 555,
+      "unit": "unit",
+      "alarm": {
+        "value": 0,
+        "limits": {
+          "lolo": 0,
+          "low": 0,
+          "high": 1024,
+          "hihi": 1024
+        },
+        "notify": {
+          "name": "",
+          "number": "",
+          "time": 0
+        }
+      }
+    },
+    {
+      "attr": "offset-quad",
+      "type": "scalar",
+      "value": 455,
+      "unit": "unit",
+      "alarm": {
+        "value": 0,
+        "limits": {
+          "lolo": 0,
+          "low": 0,
+          "high": 1024,
+          "hihi": 1024
+        },
+        "notify": {
+          "name": "",
+          "number": "",
+          "time": 0
+        }
+      }
+    },
+    {
+      "attr": "on-dipole",
+      "type": "scalar",
+      "value": 0,
+      "unit": "unit",
+      "alarm": {
+        "value": 0,
+        "limits": {
+          "lolo": -1,
+          "low": -1,
+          "high": 2,
+          "hihi": 2
+        },
+        "notify": {
+          "name": "",
+          "number": "",
+          "time": 0
+        }
+      }
+    },
+    {
+      "attr": "on-quad",
+      "type": "scalar",
+      "value": 0,
+      "unit": "unit",
+      "alarm": {
+        "value": 0,
+        "limits": {
+          "lolo": -1,
+          "low": -1,
+          "high": 2,
+          "hihi": 2
+        },
+        "notify": {
+          "name": "",
+          "number": "",
+          "time": 0
+        }
+      }
+    },
+    {
+      "attr": "sign-dipole",
+      "type": "scalar",
+      "value": 1,
+      "unit": "unit",
+      "alarm": {
+        "value": 0,
+        "limits": {
+          "lolo": -2,
+          "low": -2,
+          "high": 2,
+          "hihi": 2
+        },
+        "notify": {
+          "name": "",
+          "number": "",
+          "time": 0
+        }
+      }
+    },
+    {
+      "attr": "sign-quad",
+      "type": "scalar",
+      "value": -1,
+      "unit": "unit",
+      "alarm": {
+        "value": 0,
+        "limits": {
+          "lolo": -2,
+          "low": -2,
+          "high": 2,
+          "hihi": 2
+        },
+        "notify": {
+          "name": "",
+          "number": "",
+          "time": 0
+        }
+      }
+    },
+    {
+      "attr": "gain-dipole",
+      "type": "scalar",
+      "value": 2,
+      "unit": "unit",
+      "alarm": {
+        "value": 0,
+        "limits": {
+          "lolo": -8,
+          "low": -8,
+          "high": 8,
+          "hihi": 8
+        },
+        "notify": {
+          "name": "",
+          "number": "",
+          "time": 0
+        }
+      }
+    },
+    {
+      "attr": "gain-quad",
+      "type": "scalar",
+      "value": 1,
+      "unit": "unit",
+      "alarm": {
+        "value": 0,
+        "limits": {
+          "lolo": -8,
+          "low": -8,
+          "high": 8,
+          "hihi": 8
+        },
+        "notify": {
+          "name": "",
+          "number": "",
+          "time": 0
+        }
+      }
+    },
+    {
+      "attr": "filter-dipole",
+      "type": "scalar",
+      "value": 19,
+      "unit": "unit",
+      "alarm": {
+        "value": 0,
+        "limits": {
+          "lolo": 1,
+          "low": 1,
+          "high": 20,
+          "hihi": 20
+        },
+        "notify": {
+          "name": "",
+          "number": "",
+          "time": 0
+        }
+      }
+    },
+    {
+      "attr": "filter-quad",
+      "type": "scalar",
+      "value": 9,
+      "unit": "unit",
+      "alarm": {
+        "value": 0,
+        "limits": {
+          "lolo": 1,
+          "low": 1,
+          "high": 20,
+          "hihi": 20
+        },
+        "notify": {
+          "name": "",
+          "number": "",
+          "time": 0
+        }
+      }
+    }
+  ]
+}
