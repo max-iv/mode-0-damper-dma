@@ -8,7 +8,7 @@
     {
       "attr": "linkQuality",
       "type": "scalar",
-      "value": 0,
+      "value": 62,
       "unit": "/70",
       "alarm": {
         "value": 0,
@@ -28,7 +28,7 @@
     {
       "attr": "signalLevel",
       "type": "scalar",
-      "value": 0,
+      "value": -48,
       "unit": "dBm",
       "alarm": {
         "value": 0,
@@ -130,7 +130,7 @@
     {
       "attr": "on-dipole",
       "type": "scalar",
-      "value": 0,
+      "value": 1,
       "unit": "unit",
       "alarm": {
         "value": 0,

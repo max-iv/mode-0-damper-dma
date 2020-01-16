@@ -134,6 +134,28 @@
         "responsetimeout": ""
     },
     {
+        "id": "fac4d57e.adeeb8",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "MQTT Broker 1",
+        "broker": "$(MQTTSERVERIP1)",
+        "port": "1883",
+        "clientid": "$(MQTTCLIENTID)",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
         "id": "93049b70.2dc5c8",
         "type": "mqtt out",
         "z": "5f562f66.a301e",
@@ -208,7 +230,8 @@
         "y": 40,
         "wires": [
             [
-                "93049b70.2dc5c8"
+                "93049b70.2dc5c8",
+                "614c7057.1ab8d"
             ]
         ]
     },
@@ -1091,6 +1114,36 @@
         "wires": [
             [
                 "5902d0c0.241a6"
+            ]
+        ]
+    },
+    {
+        "id": "614c7057.1ab8d",
+        "type": "mqtt out",
+        "z": "5f562f66.a301e",
+        "name": "Publish Readings 1",
+        "topic": "$(MQTTPUBLISHTOPIC)",
+        "qos": "0",
+        "retain": "false",
+        "broker": "fac4d57e.adeeb8",
+        "x": 1070,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "f767af62.e11ee",
+        "type": "mqtt in",
+        "z": "5f562f66.a301e",
+        "name": "Subscribe Settings 1",
+        "topic": "$(MQTTSUBSCRIBETOPIC)",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "fac4d57e.adeeb8",
+        "x": 130,
+        "y": 960,
+        "wires": [
+            [
+                "dc36009e.fdeeb"
             ]
         ]
     }
