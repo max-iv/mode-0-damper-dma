@@ -197,8 +197,7 @@
         "y": 880,
         "wires": [
             [
-                "de05ba8f.6881d8",
-                "aad8ecf5.c0443"
+                "8e27c58d.334d78"
             ]
         ]
     },
@@ -216,23 +215,6 @@
         "y": 720,
         "wires": [
             []
-        ]
-    },
-    {
-        "id": "cd04ce51.35497",
-        "type": "function",
-        "z": "5f562f66.a301e",
-        "name": "Check Reading Alarms",
-        "func": "for (var ii = 0; ii < msg.payload.readings.length; ++ii)\n{\n    if (msg.payload.readings[ii].type == 'scalar')\n    {\n        msg.payload.readings[ii].alarm.value = 0;\n        if (!isNaN(msg.payload.readings[ii].value))\n        {\n            if (msg.payload.readings[ii].value < msg.payload.readings[ii].alarm.limits.low)  msg.payload.readings[ii].alarm.value = 1;\n            if (msg.payload.readings[ii].value < msg.payload.readings[ii].alarm.limits.lolo) msg.payload.readings[ii].alarm.value = 3;\n            if (msg.payload.readings[ii].value > msg.payload.readings[ii].alarm.limits.high) msg.payload.readings[ii].alarm.value = 2;\n            if (msg.payload.readings[ii].value > msg.payload.readings[ii].alarm.limits.hihi) msg.payload.readings[ii].alarm.value = 4;\n        }\n    }\n}\nflow.set('device', msg.payload);\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 840,
-        "y": 40,
-        "wires": [
-            [
-                "93049b70.2dc5c8",
-                "614c7057.1ab8d"
-            ]
         ]
     },
     {
@@ -297,14 +279,14 @@
         "type": "function",
         "z": "5f562f66.a301e",
         "name": "get readings",
-        "func": "function getAttrObject(device, propName, attrName)\n{\n    var props = device[propName];\n    var attr = props.find(attr => attr.attr === attrName);\n    return attr;\n}\n\nvar device = flow.get('device');\nvar attrLink = getAttrObject(device, 'readings', 'linkQuality');\nvar attrSignal = getAttrObject(device, 'readings', 'signalLevel');\nattrLink.value = flow.get('linkQuality');\nattrSignal.value = flow.get('signalLevel');\n\nreturn {topic:'device',payload:device};",
+        "func": "var device = flow.get('device');\nvar attrLink = device.linkQuality;\nvar attrSignal = device.signalLevel;\nattrLink.value = flow.get('linkQuality');\nattrSignal.value = flow.get('signalLevel');\n\nreturn {topic:'device',payload:device};",
         "outputs": 1,
         "noerr": 0,
         "x": 650,
         "y": 40,
         "wires": [
             [
-                "cd04ce51.35497"
+                "5b761ced.98ef04"
             ]
         ]
     },
@@ -367,7 +349,7 @@
         "type": "function",
         "z": "5f562f66.a301e",
         "name": "parse initSettings",
-        "func": "function getAttrObject(device, propName, attrName)\n{\n    var props = device[propName];\n    var attr = props.find(attr => attr.attr === attrName);\n    return attr;\n}\n\nvar device = msg.payload;\nfor (var ii = 0; ii < msg.payload.settings.length; ++ii)\n{\n    if (msg.payload.settings[ii].type == 'scalar')\n    {\n        msg.payload.settings[ii].alarm.value = 0;\n        if (!isNaN(msg.payload.settings[ii].value))\n        {\n            if (msg.payload.settings[ii].value < msg.payload.settings[ii].alarm.limits.low)  msg.payload.settings[ii].alarm.value = 1;\n            if (msg.payload.settings[ii].value < msg.payload.settings[ii].alarm.limits.lolo) msg.payload.settings[ii].alarm.value = 3;\n            if (msg.payload.settings[ii].value > msg.payload.settings[ii].alarm.limits.high) msg.payload.settings[ii].alarm.value = 2;\n            if (msg.payload.settings[ii].value > msg.payload.settings[ii].alarm.limits.hihi) msg.payload.settings[ii].alarm.value = 4;\n        }\n    }\n}\n\nflow.set('device', msg.payload);    \n\nreturn [\n    {topic:'chanOn0',       payload:getAttrObject(device, 'settings', 'on-dipole').value},\n    {topic:'timeOffset0',   payload:getAttrObject(device, 'settings', 'filter-dipole').value},\n    {topic:'sign0',         payload:getAttrObject(device, 'settings', 'sign-dipole').value},\n    {topic:'maxAcValue0',   payload:getAttrObject(device, 'settings', 'max-ac-dipole').value},\n    {topic:'gain0',         payload:getAttrObject(device, 'settings', 'gain-dipole').value},\n    {topic:'dacOffset0',    payload:getAttrObject(device, 'settings', 'offset-dipole').value},\n    {topic:'chanOn1',       payload:getAttrObject(device, 'settings', 'on-quad').value},\n    {topic:'timeOffset1',   payload:getAttrObject(device, 'settings', 'filter-quad').value},\n    {topic:'sign1',         payload:getAttrObject(device, 'settings', 'sign-quad').value},\n    {topic:'maxAcValue1',   payload:getAttrObject(device, 'settings', 'max-ac-quad').value},\n    {topic:'gain1',         payload:getAttrObject(device, 'settings', 'gain-quad').value},\n    {topic:'dacOffset1',    payload:getAttrObject(device, 'settings', 'offset-quad').value},\n    ];\n",
+        "func": "var device = msg.payload;\n\nflow.set('device', msg.payload);    \n\nreturn [\n    {topic:'chanOn0',       payload : device.onDipole.value},\n    {topic:'timeOffset0',   payload : device.filterDipole.value},\n    {topic:'sign0',         payload : device.signDipole.value},\n    {topic:'maxAcValue0',   payload : device.maxAcDipole.value},\n    {topic:'gain0',         payload : device.gainDipole.value},\n    {topic:'dacOffset0',    payload : device.offsetDipole.value},\n    {topic:'chanOn1',       payload : device.onQuad.value},\n    {topic:'timeOffset1',   payload : device.filterQuad.value},\n    {topic:'sign1',         payload : device.signQuad.value},\n    {topic:'maxAcValue1',   payload : device.maxAcQuad.value},\n    {topic:'gain1',         payload : device.gainQuad.value},\n    {topic:'dacOffset1',    payload : device.offsetQuad.value},\n    ];\n",
         "outputs": 12,
         "noerr": 0,
         "x": 690,
@@ -709,7 +691,7 @@
         "type": "function",
         "z": "5f562f66.a301e",
         "name": "parse initSettings",
-        "func": "function getAttrObject(device, propName, attrName)\n{\n    var props = device[propName];\n    var attr = props.find(attr => attr.attr === attrName);\n    return attr;\n}\n\nvar device = msg.payload;\nfor (var ii = 0; ii < msg.payload.settings.length; ++ii)\n{\n    if (msg.payload.settings[ii].type == 'scalar')\n    {\n        msg.payload.settings[ii].alarm.value = 0;\n        if (!isNaN(msg.payload.settings[ii].value))\n        {\n            if (msg.payload.settings[ii].value < msg.payload.settings[ii].alarm.limits.low)  msg.payload.settings[ii].alarm.value = 1;\n            if (msg.payload.settings[ii].value < msg.payload.settings[ii].alarm.limits.lolo) msg.payload.settings[ii].alarm.value = 3;\n            if (msg.payload.settings[ii].value > msg.payload.settings[ii].alarm.limits.high) msg.payload.settings[ii].alarm.value = 2;\n            if (msg.payload.settings[ii].value > msg.payload.settings[ii].alarm.limits.hihi) msg.payload.settings[ii].alarm.value = 4;\n        }\n    }\n}\nvar teensyName = [\n    'chanOn0',\n    'timeOffset0',\n    'sign0',\n    'maxAcValue0',\n    'gain0',\n    'dacOffset0',\n    'chanOn1',\n    'timeOffset1',\n    'sign1',\n    'maxAcValue1',\n    'gain1',\n    'dacOffset1',\n    ];\nvar attrName = [\n    'on-dipole',\n    'filter-dipole',\n    'sign-dipole',\n    'max-ac-dipole',\n    'gain-dipole',\n    'offset-dipole',\n    'on-quad',\n    'filter-quad',\n    'sign-quad',\n    'max-ac-quad',\n    'gain-quad',\n    'offset-quad',\n    ]\nvar oldDevice = flow.get('device');\nvar payload = [];\nfor (var ii = 0; ii < 13; ++ii) payload[ii] = null;\nvar icount = 1;\nfor (var ii = 0; ii < 12; ++ii)\n{\n    if (getAttrObject(device, 'settings', attrName[ii]).value != getAttrObject(oldDevice, 'settings', attrName[ii]).value)\n    {\n        payload[icount] = {topic:teensyName[ii], payload:getAttrObject(device, 'settings', attrName[ii]).value};\n        ++icount;\n    }\n}\nvar attrLink = getAttrObject(device, 'readings', 'linkQuality');\nvar attrSignal = getAttrObject(device, 'readings', 'signalLevel');\nattrLink.value = flow.get('linkQuality');\nattrSignal.value = flow.get('signalLevel');\npayload[0] = {topic:'device',payload:device};\nflow.set('device', device);    \n\nreturn payload;\n",
+        "func": "\nvar device = msg.payload;\n\nvar teensyName = [\n    'chanOn0',\n    'timeOffset0',\n    'sign0',\n    'maxAcValue0',\n    'gain0',\n    'dacOffset0',\n    'chanOn1',\n    'timeOffset1',\n    'sign1',\n    'maxAcValue1',\n    'gain1',\n    'dacOffset1',\n    ];\nvar attrName = [\n    'onDipole',\n    'filterDipole',\n    'signDipole',\n    'maxAcDipole',\n    'gainDipole',\n    'offsetDipole',\n    'onQuad',\n    'filterQuad',\n    'signQuad',\n    'maxAcQuad',\n    'gainQuad',\n    'offsetQuad',\n    ]\nvar oldDevice = flow.get('device');\nvar payload = [];\nfor (var ii = 0; ii < 13; ++ii) payload[ii] = null;\nvar icount = 1;\nfor (var ii = 0; ii < 12; ++ii)\n{\n    if (device[ attrName[ii] ].value != oldDevice[ attrName[ii] ].value)\n    {\n        payload[icount] = {topic:teensyName[ii], payload : device[ attrName[ii] ].value};\n        ++icount;\n    }\n}\nvar attrLink = device.linkQuality;\nvar attrSignal = device.signalLevel;\nattrLink.value = flow.get('linkQuality');\nattrSignal.value = flow.get('signalLevel');\npayload[0] = {topic:'device',payload:device};\nflow.set('device', device);    \n\nreturn payload;\n",
         "outputs": 13,
         "noerr": 0,
         "x": 650,
@@ -767,7 +749,7 @@
         "tostatus": false,
         "complete": "false",
         "x": 1350,
-        "y": 400,
+        "y": 380,
         "wires": []
     },
     {
@@ -1087,7 +1069,7 @@
         "y": 100,
         "wires": [
             [
-                "cd04ce51.35497"
+                "5b761ced.98ef04"
             ]
         ]
     },
@@ -1144,6 +1126,40 @@
         "wires": [
             [
                 "dc36009e.fdeeb"
+            ]
+        ]
+    },
+    {
+        "id": "8e27c58d.334d78",
+        "type": "function",
+        "z": "5f562f66.a301e",
+        "name": "Settings Alarm Scan",
+        "func": "scalarAlarmScan(msg.payload, 'setting');\nflow.set('device', msg.payload); \n\nreturn msg;\n\nfunction getActionArray(device, type, actionType)\n{\n    var actionArray = [];\n    var keys = Object.keys(device);\n    for (var ii = 0; ii < keys.length; ++ii)\n    {\n        if (device[keys[ii]].hasOwnProperty('type'))\n        {\n            if (device[keys[ii]].type == type)\n            {\n                if (device[keys[ii]].action == actionType)\n                {\n                    actionArray.push(device[keys[ii]]);\n                }\n            }\n        }\n    }\n    return actionArray;\n}\nfunction scalarAlarmScan(device, actionType)\n{\n    var actionArray = getActionArray(device, 'scalar', actionType);\n    if (actionArray.length > 0)\n    {\n        for (var ii = 0; ii < actionArray.length; ++ii)\n        {\n            actionArray[ii].alarm.value = 0;\n            if (!isNaN(actionArray[ii].value))\n            {\n                if (actionArray[ii].value < actionArray[ii].alarm.limits.low)  actionArray[ii].alarm.value = 1;\n                if (actionArray[ii].value < actionArray[ii].alarm.limits.lolo) actionArray[ii].alarm.value = 3;\n                if (actionArray[ii].value > actionArray[ii].alarm.limits.high) actionArray[ii].alarm.value = 2;\n                if (actionArray[ii].value > actionArray[ii].alarm.limits.hihi) actionArray[ii].alarm.value = 4;\n            }\n        }\n    }\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 380,
+        "y": 940,
+        "wires": [
+            [
+                "aad8ecf5.c0443",
+                "de05ba8f.6881d8"
+            ]
+        ]
+    },
+    {
+        "id": "5b761ced.98ef04",
+        "type": "function",
+        "z": "5f562f66.a301e",
+        "name": "Readings Alarm Scan",
+        "func": "scalarAlarmScan(msg.payload, 'reading');\nflow.set('device', msg.payload); \n\nreturn msg;\n\nfunction getActionArray(device, type, actionType)\n{\n    var actionArray = [];\n    var keys = Object.keys(device);\n    for (var ii = 0; ii < keys.length; ++ii)\n    {\n        if (device[keys[ii]].hasOwnProperty('type'))\n        {\n            if (device[keys[ii]].type == type)\n            {\n                if (device[keys[ii]].action == actionType)\n                {\n                    actionArray.push(device[keys[ii]]);\n                }\n            }\n        }\n    }\n    return actionArray;\n}\nfunction scalarAlarmScan(device, actionType)\n{\n    var actionArray = getActionArray(device, 'scalar', actionType);\n    if (actionArray.length > 0)\n    {\n        for (var ii = 0; ii < actionArray.length; ++ii)\n        {\n            actionArray[ii].alarm.value = 0;\n            if (!isNaN(actionArray[ii].value))\n            {\n                if (actionArray[ii].value < actionArray[ii].alarm.limits.low)  actionArray[ii].alarm.value = 1;\n                if (actionArray[ii].value < actionArray[ii].alarm.limits.lolo) actionArray[ii].alarm.value = 3;\n                if (actionArray[ii].value > actionArray[ii].alarm.limits.high) actionArray[ii].alarm.value = 2;\n                if (actionArray[ii].value > actionArray[ii].alarm.limits.hihi) actionArray[ii].alarm.value = 4;\n            }\n        }\n    }\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 860,
+        "y": 40,
+        "wires": [
+            [
+                "93049b70.2dc5c8",
+                "614c7057.1ab8d"
             ]
         ]
     }
