@@ -2,12 +2,12 @@
   "name": "r3",
   "deviceType": "mode-0-damper",
   "arcPeriod": 60000,
-  "timeStamp": 0,
-  "lastArchive": 0,
+  "timeStamp": 1602558934093,
+  "lastArchive": 1602558926093,
   "linkQuality": {
     "action": "reading",
     "type": "scalar",
-    "value": 64,
+    "value": 57,
     "unit": "/70",
     "alarm": {
       "value": 0,
@@ -27,7 +27,7 @@
   "signalLevel": {
     "action": "reading",
     "type": "scalar",
-    "value": -46,
+    "value": -53,
     "unit": "dBm",
     "alarm": {
       "value": 0,
@@ -187,7 +187,7 @@
   "signQuad": {
     "action": "setting",
     "type": "scalar",
-    "value": -1,
+    "value": 1,
     "unit": "unit",
     "alarm": {
       "value": 0,
